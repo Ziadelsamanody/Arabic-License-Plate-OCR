@@ -57,6 +57,15 @@ The server will start at `http://0.0.0.0:8000`.
 
 All routes are mounted under `/api`.
 
+### Swagger / OpenAPI Docs
+
+FastAPI exposes interactive API documentation automatically.
+
+- Swagger UI: `http://127.0.0.1:8000/docs`
+- ReDoc: `http://127.0.0.1:8000/redoc`
+
+Use Swagger UI to try the endpoints directly from the browser and upload test images to `/api/detect`.
+
 ### Health Check
 
 #### `GET /api/health`
