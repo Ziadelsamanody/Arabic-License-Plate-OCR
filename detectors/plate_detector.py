@@ -6,7 +6,7 @@ from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 
 
-MODEL_PATH = Path(__file__).resolve().parent / 'egypt_plate_detector' / 'weights' / 'best.pt'
+MODEL_PATH = Path(__file__).resolve().parent / 'best.pt'
 
 
 
