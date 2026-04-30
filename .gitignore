@@ -3,5 +3,9 @@
 
 venv/*  
 
+detectors/egypt_plate_detector/*
 
-detectors/*
+OCR.ipynb 
+*.ipynb
+
+
