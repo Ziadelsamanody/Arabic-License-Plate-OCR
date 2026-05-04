@@ -9,3 +9,6 @@ OCR.ipynb
 *.ipynb
 
 
+testvideos/*
+
+yolov8n.pt 
