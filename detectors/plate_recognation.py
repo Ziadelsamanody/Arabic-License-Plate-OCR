@@ -103,7 +103,7 @@ if __name__ == '__main__':
     import matplotlib.pyplot as plt
     image_path = Path(__file__).resolve().parents[1] / 'test_images' / 'plate2.jpg'
     image = cv.imread(str(image_path))
-    plate_detector = PlateDetector()
+    plate_detector = PlateRecognation()
 
     detections = plate_detector.detect_frame(image)
     print(f'Detections: {detections}')
