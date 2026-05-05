@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from routes import routes, health
-from detectors import plate_detector
+from detectors import PlateRecognation
 import uvicorn
 import contextlib
 

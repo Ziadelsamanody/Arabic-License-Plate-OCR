@@ -3,7 +3,7 @@
 
 venv/*  
 
-detectors/egypt_plate_detector/*
+detectors/plate_recognation/*
 
 OCR.ipynb 
 *.ipynb

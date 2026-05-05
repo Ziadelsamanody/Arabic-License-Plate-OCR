@@ -5,10 +5,10 @@ import sys
 import cv2 as cv
 import numpy as np
 sys.path.append('./detectors')
-from detectors import PlateDetector
+from detectors import  PlateRecognation
 
 
-detector = PlateDetector()
+detector = PlateRecognation()
 
 
 router = APIRouter()
