@@ -50,6 +50,12 @@ class PlateRecognation:
     @staticmethod
     def map_class_to_arabic(class_name):
         return ARABIC_CLASS_MAP.get(class_name, class_name)
+    def detect_frames(self, frames):
+        all_frames = []
+        for frame in frames :
+            plate_recognaizer = self.detect_frame(frame)
+            all_frames.append(plate_recognaizer)
+        return all_frames
 
     def detect_frame(self, frame, imgsz=640, conf=0.25):
         result = self.detector.predict(frame, imgsz=imgsz, conf=conf, verbose=False)[0]
