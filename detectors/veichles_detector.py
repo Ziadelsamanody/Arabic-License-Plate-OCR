@@ -28,7 +28,7 @@ class VeichleDetector:
             bbox = box.xyxy[0].tolist()
             object_cls_id = int(box.cls.tolist()[0])
             object_cls_name = id_names_dict[object_cls_id]
-            if object_cls_name == 'car':
+            if object_cls_name in ['car', 'motorcycle', 'bus', 'truck']:
                 car_detection[track_id] = bbox
 
         return car_detection
@@ -46,44 +46,8 @@ class VeichleDetector:
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
     
-    video_path = Path(__file__).resolve().parents[1] / 'testvideos' / 'clip2.mp4'
-    cap = cv.VideoCapture(str(video_path))
-    cap.set(cv.CAP_PROP_POS_FRAMES, 50)  # Grab a frame from the middle
-    ret, frame = cap.read()
-    cap.release()
+  
     
-    if ret:
-        detector = VeichleDetector()
-        detections = detector.detect_frame(frame)
-        
-        crops = []
-        for track_id, bbox in detections.items():
-            x1, y1, x2, y2 = map(int, bbox)
-            # Crop the car out of the original frame
-            car_crop = frame[y1:y2, x1:x2]
-            if car_crop.size > 0:
-                crops.append((track_id, car_crop))
-        
-        print(f"Detected {len(crops)} cars.")
-        
-        if crops:
-            # Display cropped cars
-            fig, axes = plt.subplots(1, len(crops), figsize=(15, 5))
-            if len(crops) == 1:
-                axes = [axes]
-            
-            for ax, (t_id, crop) in zip(axes, crops):
-                ax.imshow(cv.cvtColor(crop, cv.COLOR_BGR2RGB))
-                ax.set_title(f"Car ID: {t_id}")
-                ax.axis('off')
-            
-            plt.tight_layout()
-            plt.show()
-    else:
-        print("Failed to read video.") 
-
-
-
 
 
 
