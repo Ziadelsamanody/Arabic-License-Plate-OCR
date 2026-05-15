@@ -2,9 +2,13 @@
 
 A full-stack application designed to detect and recognize Arabic license plates. It utilizes custom trained YOLOv8 models for accurate vehicle and character detection, paired with a FastAPI backend and a modern Nuxt.js/Vue frontend interface.
 
-## Example Output
+## Example Input & Output
 
-![Output Image](./out_image.jpg)
+**Input Image:**
+![Input Image](./output/car2.jpg)
+
+**Output Image:**
+![Output Image](./output/out_image.jpg)
 
 ## Project Overview & Details
 
