@@ -12,3 +12,5 @@ OCR.ipynb
 testvideos/*
 
 yolov8n.pt 
+
+test_images/random_frames/*
