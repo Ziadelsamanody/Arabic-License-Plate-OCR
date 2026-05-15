@@ -18,7 +18,9 @@ class PlateDetector:
             detections.append(car_detection)
         return detections
     def detect_plate_crop(self, car_crop):
-        result = self.model.predict(car_crop, imgsz=640, conf=0.25, verbose=False)[0]
+        # We lower conf to 0.15 so it catches blurry/tiny plates
+        # (It was 0.45, which ignores anything slightly unclear)
+        result = self.model.predict(car_crop, imgsz=320, conf=0.15, verbose=False)[0]
         if len(result.boxes) > 0:
             bbox = result.boxes.xyxy[0].tolist()
             return bbox

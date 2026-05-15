@@ -18,7 +18,9 @@ class VeichleDetector:
             detections.append(car_detection)
         return detections
     def detect_frame(self, frame):
-        result = self.model.track(frame,classes=[2,3,5,7] ,persist=True)[0]
+        # Added tracker='bytetrack.yaml' for much stabler IDs
+        # Added conf=0.3 to reduce false positive jitter but keep tracking solid
+        result = self.model.track(frame, classes=[2,3,5,7], persist=True, tracker="bytetrack.yaml", conf=0.3, verbose=False)[0]
         id_names_dict = result.names
         car_detection = {}
         for box in result.boxes : 
@@ -32,16 +34,7 @@ class VeichleDetector:
                 car_detection[track_id] = bbox
 
         return car_detection
-    
-    def draw_boxes(self, frames, car_detection):  
-        annotated_frames = []
-        for frame, detection in zip(frames, car_detection): 
-            for track_id, bbox in detection.items(): 
-                x1, y1, x2, y2 = map(int, bbox)
-                cv.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 4)
-                cv.putText(frame, f'CAR:{track_id}', (x1, max(0, y2 - 10)), cv.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 2)
-            annotated_frames.append(frame)
-        return annotated_frames
+
 
 if __name__ == '__main__':
     import matplotlib.pyplot as plt

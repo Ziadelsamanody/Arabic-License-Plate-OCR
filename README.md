@@ -1,55 +1,75 @@
 # Arabic License Plate OCR
 
-A FastAPI service for detecting Egyptian license plate characters with a custom YOLO model, mapping the detections to Arabic characters, and returning a cleaned plate string through an HTTP API.
+A full-stack application designed to detect and recognize Arabic license plates. It utilizes custom trained YOLOv8 models for accurate vehicle and character detection, paired with a FastAPI backend and a modern Nuxt.js/Vue frontend interface.
 
-## What This Project Does
+## Example Output
 
-The project takes an uploaded plate image, runs object detection on the characters, sorts the detections from left to right, maps class names to Arabic glyphs, and returns the final detected sequence.
+![Output Image](./out_image.jpg)
+
+## Project Overview & Details
+
+The project consists of a machine learning object detection pipeline served internally via a FastAPI backend, combined with an interactive Web UI for easy image uploads and historical tracking.
+
+**Note on Current State (Two-Part System):**
+Currently, the project is divided into two parts:
+1. **Frontend (Plate Recognition Only):** The Nuxt.js frontend is actively configured to work only with the Plate Recognition part (processing cropped plate images directly). 
+2. **Backend/Scripts (Full Pipeline):** The files and models for full vehicle processing and plate detection (`veichles_detector.py`, `plate_detector.pt`) are still included and functional in the repository. You can use these scripts manually or through the API for the complete vehicle-to-plate flow.
+
+### Workflow:
+1. **Vehicle & Plate Detection (Backend available)**: The system can identify vehicles and specific license plates in the frame using `yolov8n.pt` and `plate_detector.pt`.
+2. **Character Recognition (Frontend & Backend)**: High-resolution cropped plate images are passed to `plate_recognation.pt`, which isolates overlapping, skewed, or noisy characters.
+3. **Arabic Character Mapping**: Character classes detected by the YOLO model are sorted horizontally (left-to-right or right-to-left based on Arabic grammar/plate layout standard) and mapped to actual Arabic glyphs.
+4. **Data Delivery**: The finalized text and rendered output image (bounding boxes applied) are exposed through REST API endpoints.
+5. **Frontend Application**: A Nuxt.js SPA allows users to interactively drag and drop cropped plate images, view detections via HTML canvas, and browse a history of results.
 
 ## Project Structure
 
 - `main.py` - FastAPI application entrypoint.
-- `routes/health.py` - health-check endpoint.
-- `routes/routes.py` - detection endpoint that accepts uploaded images.
-- `detectors/plate_detector.py` - YOLO wrapper, Arabic class mapping, drawing helpers, and label filtering.
-- `detectors/best.pt` - trained YOLO weights used by the detector.
-- `test.py` - simple standalone YOLO inference script.
-- `test_images/` - sample input and output images.
-- `OCR.ipynb` - notebook for experimentation.
+- `routes/` - API definitions (Health checks, image upload, and detection endpoints).
+- `detectors/` - Core ML logic, YOLO wrappers, weight files (`plate_detector.pt`, `plate_recognation.pt`), Arabic class mapping, and drawing helpers.
+- `utils/` - Utility functions for image processing and OpenCV operations.
+- `frontend/` - Nuxt.js Vue application codebase (UI components, composables, and pages).
+- `traing/` - Jupyter Notebooks (`Plate_Detection.ipynb`) used for experimentation and model training.
 
-## How It Works
+## Setup & Installation
 
-1. `main.py` creates the FastAPI app and mounts the routes under `/api`.
-2. `routes/health.py` returns a basic status response for service checks.
-3. `routes/routes.py` accepts an uploaded image, decodes it with OpenCV, and calls the detector.
-4. `detectors/plate_detector.py` loads the YOLO model, maps model classes to Arabic characters, sorts detections by X position, and returns the final label list.
+### Backend
 
-## Setup
+1. **Create and activate the virtual environment:**
+   ```powershell
+   python -m venv venv
+   .\venv\Scripts\Activate.ps1
+   ```
 
-### 1. Create and activate the virtual environment
+2. **Install dependencies:**
+   ```powershell
+   pip install -r requirements.txt
+   ```
+   *(Ensure you install CUDA-specific PyTorch wheels if you plan on utilizing a GPU)*
 
-```powershell
-python -m venv venv
-.\venv\Scripts\Activate.ps1
-```
+3. **Run the API:**
+   ```powershell
+   python main.py
+   ```
+   The backend will start at `http://localhost:8000`.
 
-### 2. Install dependencies
+### Frontend
 
-Install the packages used by the project:
+1. **Navigate to the frontend directory:**
+   ```powershell
+   cd frontend
+   ```
 
-```powershell
-pip install fastapi uvicorn ultralytics opencv-python numpy matplotlib pillow torch
-```
+2. **Install Node.js dependencies:**
+   ```bash
+   npm install
+   ```
 
-If your YOLO / PyTorch setup needs a CUDA-specific build, install the matching wheel for your machine instead of the default CPU package.
-
-### 3. Run the API
-
-```powershell
-python main.py
-```
-
-The server will start at `http://0.0.0.0:8000`.
+3. **Run the development server:**
+   ```bash
+   npm run dev
+   ```
+   The frontend UI will be accessible typically at `http://localhost:3000`.
 
 ## API Documentation
 
@@ -60,79 +80,11 @@ All routes are mounted under `/api`.
 ### Swagger / OpenAPI Docs
 
 FastAPI exposes interactive API documentation automatically.
-
 - Swagger UI: `http://127.0.0.1:8000/docs`
 - ReDoc: `http://127.0.0.1:8000/redoc`
 
 Use Swagger UI to try the endpoints directly from the browser and upload test images to `/api/detect`.
 
-### Health Check
-
-#### `GET /api/health`
-
-Returns the service status and whether PyTorch sees CUDA.
-
-Example response:
-
-```json
-{
-  "status": "working",
-  "device": "cpu"
-}
-```
-
-### Detect Plate Characters
-
-#### `POST /api/detect`
-
-Accepts a single uploaded image file and returns the detected plate characters.
-
-#### Request
-
-- Content type: `multipart/form-data`
-- Field name: `image`
-- Type: image file
-
-#### Example with `curl`
-
-```powershell
-curl -X POST "http://127.0.0.1:8000/api/detect" ^
-  -F "image=@test_images/plate2.jpg"
-```
-
-#### Example response
-
-```json
-{
-  "success": true,
-  "labels": ["٩", "٨", "٣", "د", "س", "ي"],
-  "plate_text": "٩٨٣دسي",
-  "detections": [
-    {
-      "label": "٩",
-      "bbox": [63.6, 131.3, 123.1, 255.5]
-    }
-  ]
-}
-```
-
-#### Error responses
-
-- `400 Bad Request` - no file uploaded or the image could not be decoded.
-- `500 Internal Server Error` - unexpected runtime failure during detection.
-
-## Detector Notes
-
-- The detector sorts boxes from left to right before filtering the labels.
-- Arabic class mapping is defined in `detectors/plate_detector.py`.
-- `draw_boxes()` can be used for visual debugging and annotation.
-
 ## Testing the Model Manually
 
 `test.py` is a quick one-off script for running YOLO inference on a sample image and saving an annotated output.
-
-## Next Improvements
-
-- Add plate-specific grouping logic if the number/letter order needs post-processing.
-- Return confidence scores alongside each detection.
-- Add automated tests for the API and detector output.
